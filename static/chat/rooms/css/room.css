@@ -1,0 +1,93 @@
+/* ملف CSS الرئيسي - يجمع كل المكونات */
+@import 'base.css';
+@import 'components/header.css';
+@import 'components/sidebar.css';
+@import 'components/messages.css';
+@import 'components/input.css';
+@import 'components/emoji.css';
+@import 'components/typing.css';
+@import 'components/modals.css';
+
+/* ========== تحسينات للشاشات الصغيرة ========== */
+@media (max-width: 768px) {
+    body {
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .chat-container {
+        height: calc(100vh - var(--chat-header-height));
+    }
+    
+    .message {
+        max-width: 85%;
+        padding: 10px 14px;
+    }
+    
+    .input-area {
+        padding: 12px 16px;
+    }
+    
+    .input-container {
+        padding: 6px 12px;
+    }
+    
+    .message-image {
+        max-width: 220px;
+    }
+    
+    .emoji-picker {
+        width: 280px;
+        right: 10px;
+    }
+    
+    .side-panel {
+        width: 280px;
+        left: -280px;
+    }
+}
+
+/* ========== تحسينات إضافية للتصميم ========== */
+.message-date-divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.date-label {
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--text-light);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+/* أنماط إضافية للتحسينات */
+.message-link {
+    color: #0088cc;
+    text-decoration: underline;
+    word-break: break-all;
+}
+
+.message-email {
+    color: #17a2b8;
+    text-decoration: underline;
+}
+
+.message-hashtag {
+    color: #25D366;
+    font-weight: 500;
+}
+
+.temp-message {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+mark {
+    background-color: yellow;
+    color: black;
+    padding: 2px 4px;
+    border-radius: 3px;
+}

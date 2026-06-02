@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HyaCom</title>
+    
+    <!-- مجموعة الأيقونات باستخدام static -->
+    <link rel="icon" type="image/x-icon" href="{% static 'icons/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'icons/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% static 'icons/site.webmanifest' %}">
+    
+    <!-- لون شريط العنوان -->
+    <meta name="theme-color" content="#075E54">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#075E54">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/messages.css' %}">
+</head>
+<body>
+    {% block content %}
+    {% endblock %}
+    
+    <!-- JavaScript -->
+    <script src="{% static 'js/icon-manager.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

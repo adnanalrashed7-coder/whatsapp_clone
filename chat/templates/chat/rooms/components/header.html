@@ -1,0 +1,31 @@
+<!-- الهيدر المحسن -->
+<div class="chat-header">
+    <div class="header-left">
+        <button class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-right"></i>
+        </button>
+        <div class="room-avatar">
+            {{ room.name|first|upper }}
+        </div>
+        <div class="room-info">
+            <div class="room-title">{{ room.name }}</div>
+            <div class="room-subtitle">
+                <span class="online-dot"></span>
+                <span class="online-count">{{ online_count|default:1 }} متصل</span>
+                <span class="room-badge">غرفة نشطة</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="header-actions">
+        <button class="header-btn" onclick="searchInChat()" title="بحث">
+            <i class="fas fa-search"></i>
+        </button>
+        <button class="header-btn" onclick="toggleSidePanel()" title="أعضاء الغرفة">
+            <i class="fas fa-users"></i>
+        </button>
+        <button class="header-btn" onclick="showRoomSettings()" title="الإعدادات">
+            <i class="fas fa-cog"></i>
+        </button>
+    </div>
+</div>

@@ -1,0 +1,210 @@
+/* ========== نافذة عرض الصورة ========== */
+#image-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+#modal-image {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 8px;
+}
+
+#image-modal button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+/* ========== إجراءات الرسائل ========== */
+.message-actions {
+    display: none;
+    position: absolute;
+    top: -10px;
+    left: -45px;
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 20px;
+    padding: 5px;
+    gap: 2px;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.message-actions .action-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.message-actions .action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+/* ========== ردود الفعل ========== */
+.reaction-picker {
+    background: white;
+    border-radius: 25px;
+    padding: 8px 12px;
+    display: flex;
+    gap: 5px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    animation: slideUp 0.2s ease;
+    border: 1px solid #e1e1e1;
+}
+
+.reaction-option {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reaction-option:hover {
+    background: #f0f0f0;
+    transform: scale(1.3);
+}
+
+/* ========== تحرير الرسائل ========== */
+.edit-container {
+    width: 100%;
+}
+
+.message-edit-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #25D366;
+    border-radius: 12px;
+    padding: 12px;
+    color: white;
+    font-size: 14px;
+    resize: vertical;
+    margin-bottom: 10px;
+    font-family: inherit;
+}
+
+.message-edit-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.edit-controls {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.edit-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.edit-btn.save {
+    background: #25D366;
+    color: white;
+}
+
+.edit-btn.save:hover {
+    background: #1da851;
+}
+
+.edit-btn.cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.edit-btn.cancel:hover {
+    background: #5a6268;
+}
+
+.edited-indicator {
+    font-size: 11px;
+    color: #888;
+    font-style: italic;
+    margin-left: 5px;
+}
+
+/* ========== خيارات الحذف ========== */
+.delete-options-container {
+    position: absolute;
+    top: -10px;
+    left: -150px;
+    background: rgba(0, 0, 0, 0.95);
+    border-radius: 12px;
+    padding: 10px;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fadeIn 0.2s ease;
+}
+
+.delete-options {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.delete-option {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    text-align: right;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.delete-option:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.delete-option.personal:hover {
+    background: #dc3545;
+}
+
+.delete-option.everyone:hover {
+    background: #fd7e14;
+}
+
+.delete-option.cancel:hover {
+    background: #6c757d;
+}

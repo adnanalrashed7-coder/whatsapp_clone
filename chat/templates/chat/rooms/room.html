@@ -1,0 +1,94 @@
+{% extends 'chat/rooms/base_room.html' %}
+{% load static %}
+
+{% block title %}{{ room.name }}{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<!-- أي أنماط إضافية خاصة بهذه الصفحة -->
+{% endblock %}
+
+{% block content %}
+    {% include 'chat/rooms/components/messages.html' %}
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<!-- تحميل الملف الرئيسي كـ module -->
+<script type="module">
+    import { initEnhancedChat } from '{% static "chat/rooms/js/main.js" %}';
+    
+    // عندما يتم تحميل جميع المكونات، قم بتهيئة الدردشة
+    document.addEventListener('DOMContentLoaded', function() {
+        // تحديث تاريخ اليوم
+        updateDateLabel();
+        
+        // تهيئة الدردشة بعد تحميل كل شيء
+        setTimeout(() => {
+            if (typeof initEnhancedChat === 'function') {
+                console.log('🚀 بدء تهيئة الدردشة المحسنة...');
+                initEnhancedChat();
+            }
+        }, 500);
+    });
+
+    // دالة تحديث التاريخ
+    function updateDateLabel() {
+        const today = new Date().toLocaleDateString('ar-EG', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        const label = document.getElementById('today-label');
+        if (label) {
+            label.textContent = today;
+        }
+    }
+
+    // دوال عرض الصور
+    window.showImageModal = function(imageUrl) {
+        const modal = document.getElementById('image-modal');
+        const modalImage = document.getElementById('modal-image');
+        if (modal && modalImage) {
+            modalImage.src = imageUrl;
+            modal.style.display = 'flex';
+        }
+    };
+
+    window.closeImageModal = function() {
+        const modal = document.getElementById('image-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    };
+
+    // تحديث حالة الاتصال كل 30 ثانية
+function updateOnlineStatus() {
+    fetch(`/chat/online-status/${window.ROOM_ID}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': window.CSRF_TOKEN
+        },
+        body: 'action=ping'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            console.log('✅ تم تحديث حالة الاتصال');
+        }
+    })
+    .catch(error => {
+        console.error('❌ خطأ في تحديث حالة الاتصال:', error);
+    });
+}
+
+// تحديث كل 30 ثانية
+setInterval(updateOnlineStatus, 30000);
+
+// تحديث عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(updateOnlineStatus, 1000);
+});
+</script>
+{% endblock %}

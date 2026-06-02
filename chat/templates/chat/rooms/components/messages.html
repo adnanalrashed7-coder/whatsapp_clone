@@ -1,0 +1,41 @@
+{% load static %}
+
+<!-- حاوية الدردشة المحسنة -->
+<div class="chat-container">
+    <!-- منطقة الرسائل المحسنة -->
+    <div class="messages-container" id="chat-messages">
+        <!-- شريط تاريخ اليوم -->
+        <div class="message-date-divider">
+            <span class="date-bubble" id="today-label">اليوم</span>
+        </div>
+        
+        <!-- رسالة النظام (التشفير) -->
+        <div class="system-message encryption-notice">
+            <div class="encryption-content">
+                <i class="fas fa-lock"></i>
+                <span>الرسائل والمكالمات مشفرة من طرف إلى طرف. فقط الأشخاص في هذه المحادثة يمكنهم قراءتها أو الاستماع إليها.</span>
+                <a href="#" class="learn-more">اعرف المزيد</a>
+            </div>
+        </div>
+
+        <!-- مؤشر التحميل -->
+        <div id="loading-indicator" class="loading-indicator">
+            <div class="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            جاري تحميل الرسائل...
+        </div>
+        
+        <div class="no-messages" id="no-messages">
+            لا توجد رسائل بعد
+        </div>
+
+        <!-- الرسائل سيتم إضافتها هنا بالجافاسكريبت -->
+    </div>
+
+    {% include 'chat/rooms/components/typing_indicator.html' %}
+    {% include 'chat/rooms/components/reply_preview.html' %}
+    {% include 'chat/rooms/components/input_area.html' %}
+</div>

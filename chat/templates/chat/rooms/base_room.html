@@ -1,0 +1,191 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>غرفة الدردشة - {% block title %}{{ room.name }}{% endblock %}</title>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'chat/rooms/css/room.css' %}">
+    
+    <link rel="icon" type="image/x-icon" href="{% static 'icons/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/favicon-32x32.png' %}">
+    
+    <link rel="icon" type="image/x-icon" href="{% static 'icons/Hyacom1.jpg' %}">
+    {% block extra_css %}
+    <!-- أنماط إضافية للتحسينات -->
+    <style>
+        .message-link {
+            color: #0088cc;
+            text-decoration: underline;
+            word-break: break-all;
+        }
+        
+        .message-email {
+            color: #17a2b8;
+            text-decoration: underline;
+        }
+        
+        .message-hashtag {
+            color: #25D366;
+            font-weight: 500;
+        }
+        
+        .temp-message {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes highlightPulse {
+            0%, 100% { background-color: yellow; }
+            50% { background-color: orange; }
+        }
+        
+        mark {
+            background-color: yellow;
+            color: black;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        /* تحسينات عرض الملفات */
+        .file-preview {
+            margin-top: 8px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .file-preview a {
+            color: #25D366;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .file-preview a:hover {
+            color: #1da851;
+        }
+
+        .file-icon {
+            font-size: 24px;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+    {% block header %}
+    {% include 'chat/rooms/components/header.html' %}
+    {% endblock %}
+
+    {% block sidebar %}
+    {% include 'chat/rooms/components/sidebar.html' %}
+    {% endblock %}
+
+    {% block content %}
+    <!-- المحتوى الرئيسي -->
+    {% endblock %}
+
+    {% block modals %}
+    <!-- النوافذ المنبثقة -->
+    {% include 'chat/rooms/components/image_modal.html' %}
+    {% endblock %}
+
+    {% block scripts %}
+    <!-- المتغيرات العالمية -->
+    <script>
+        // تعريف المتغيرات العالمية أولاً
+        window.ROOM_ID = '{{ room.id }}';
+        window.ROOM_NAME = '{{ room.name }}';
+        window.CURRENT_USER = '{{ request.user.email }}';
+        window.CURRENT_USER_ID = '{{ request.user.id }}';
+        window.CSRF_TOKEN = '{{ csrf_token }}';
+        
+        // تعريف الدوال الأساسية مؤقتاً لمنع الأخطاء
+        window.goBack = function() { window.history.back(); };
+        window.toggleSidePanel = function() { 
+            const panel = document.getElementById('side-panel');
+            if (panel) panel.classList.toggle('open');
+        };
+        window.searchInChat = function() { 
+            const searchTerm = prompt('ابحث في المحادثة:');
+            if (searchTerm) alert('سيتم تنفيذ البحث عن: ' + searchTerm);
+        };
+        window.showRoomSettings = function() { alert('إعدادات الغرفة قريباً!'); };
+        window.handleInputChange = function(textarea) { 
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        };
+        window.sendMessage = function() { alert('جاري إرسال الرسالة...'); };
+        window.toggleEmojiPicker = function() { 
+            const picker = document.getElementById('emoji-picker');
+            if (picker) picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+        };
+        window.closeReply = function() {
+            const preview = document.getElementById('reply-preview');
+            if (preview) preview.style.display = 'none';
+        };
+        window.handleTyping = function() { console.log('جاري الكتابة...'); };
+        window.stopTyping = function() { console.log('توقف الكتابة...'); };
+    </script>
+
+    <!-- أحداث لوحة المفاتيح -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageInput = document.getElementById('message-input');
+            if (messageInput) {
+                messageInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (typeof window.sendMessage === 'function') {
+                            window.sendMessage();
+                        }
+                    }
+                });
+            }
+        });
+
+        // إدارة حالة الاتصال
+        window.addEventListener('beforeunload', function() {
+            if (typeof window.stopTyping === 'function') {
+                window.stopTyping();
+            }
+        });
+    </script>
+     <script src="{% static 'js/icon-manager.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    {% endblock %}
+   
+</body>
+</html>

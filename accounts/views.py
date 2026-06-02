@@ -5,6 +5,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage, BadHeaderError
+from django.conf import settings
 from smtplib import SMTPException
 from django.contrib import messages
 from .forms import SignUpForm
@@ -52,7 +53,8 @@ def signup(request):
             })
             
             to_email = form.cleaned_data.get('email')
-            email = EmailMessage(mail_subject, message, to=[to_email])
+            email = EmailMessage(mail_subject, message, settings.DEFAULT_FROM_EMAIL, [to_email])
+            email.content_subtype = 'html'
             
             try:
                 email.send()
@@ -84,7 +86,8 @@ def send_activation_email(user, request):
     })
     
     to_email = user.email
-    email = EmailMessage(mail_subject, message, to=[to_email])
+    email = EmailMessage(mail_subject, message, settings.DEFAULT_FROM_EMAIL, [to_email])
+    email.content_subtype = 'html'
     email.send()
 
 def send_welcome_email(user):

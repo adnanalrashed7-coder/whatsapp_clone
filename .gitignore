@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.pytest_cache
+.python-version
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# Django
+*.log
+*.pot
+*.pyc
+*.cover
+htmlcov/
+coverage.xml
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# Environment variables
+.env
+.env.*
+*.env
+
+# IDEs / editors
+.vscode/
+.idea/
+*.swp
+*~
+*.swo
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Backup files
+*.bak
+*.tmp
+
+# Django migrations history
+*/migrations/*.pyc
+*/migrations/__pycache__/
+
+# Secret key files
+secret_key.py
+
+# pytest
+.cache/
+
+# distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

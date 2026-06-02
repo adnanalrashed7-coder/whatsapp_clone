@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ChatRoom, Message
+from .models import ChatRoom, Message, TypingStatus
 
 @admin.register(ChatRoom)
 class ChatRoomAdmin(admin.ModelAdmin):
@@ -18,3 +18,11 @@ class MessageAdmin(admin.ModelAdmin):
     def content_preview(self, obj):
         return obj.content[:50] + '...' if len(obj.content) > 50 else obj.content
     content_preview.short_description = 'المحتوى'
+
+@admin.register(TypingStatus)
+class TypingStatusAdmin(admin.ModelAdmin):
+    list_display = ('user', 'room', 'is_typing', 'last_typed')
+    list_filter = ('room', 'is_typing')
+    search_fields = ('user__email', 'room__name')
+    readonly_fields = ('last_typed',)
+    date_hierarchy = 'last_typed'

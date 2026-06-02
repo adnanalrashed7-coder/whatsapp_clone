@@ -1,0 +1,34 @@
+<!-- منطقة الإدخال المثبتة -->
+<div class="input-area">
+    <div class="input-container">
+        <div class="input-actions">
+            <input type="file" id="image-input" accept="image/*" style="display: none;">
+            <button class="action-btn" onclick="document.getElementById('image-input').click()" title="إرسال صورة">
+                <i class="fas fa-image"></i>
+            </button>
+            <input type="file" id="file-input" style="display: none;">
+            <button class="action-btn" onclick="document.getElementById('file-input').click()" title="إرسال ملف">
+                <i class="fas fa-paperclip"></i>
+            </button>
+            <button class="action-btn emoji-btn" onclick="toggleEmojiPicker()" title="إيموجي">
+                <i class="far fa-smile"></i>
+            </button>
+        </div>
+        
+        <div class="message-input-container">
+            <textarea 
+                id="message-input" 
+                class="message-input" 
+                placeholder="اكتب رسالتك هنا..."
+                rows="1"
+                oninput="handleInputChange(this)"
+            ></textarea>
+        </div>
+        
+        <button id="send-button" class="send-button" onclick="sendMessage()">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+{% include 'chat/rooms/components/emoji_picker.html' %}

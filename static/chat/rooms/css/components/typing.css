@@ -1,0 +1,41 @@
+/* ========== مؤشر الكتابة المحسن ========== */
+.typing-indicator {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    max-width: 200px;
+    border-bottom-left-radius: 4px;
+    animation: fadeIn 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.typing-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.typing-dots {
+    display: flex;
+    gap: 3px;
+}
+
+.typing-dots span {
+    width: 8px;
+    height: 8px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+.typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+.typing-text {
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 500;
+    font-style: italic;
+}
