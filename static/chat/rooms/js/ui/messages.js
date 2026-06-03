@@ -188,6 +188,18 @@ export function buildMessageActionsHTML(messageData, isOwnMessage) {
 
 export function updateExistingMessage(messageElement, messageData) {
     const isOwnMessage = messageData.sender === currentUser;
+    messageElement.className = `message ${isOwnMessage ? 'own' : 'other'}`;
+    messageElement.dataset.messageId = messageData.id;
+    messageElement.dataset.sender = messageData.sender_display || messageData.sender;
+
+    if (messageData.id && messageData.id.startsWith('temp_')) {
+        messageElement.classList.add('temp-message');
+        messageElement.style.opacity = '0.7';
+    } else {
+        messageElement.classList.remove('temp-message');
+        messageElement.style.opacity = '';
+    }
+
     const messageHTML = buildInteractiveMessageHTML(messageData, isOwnMessage);
     messageElement.innerHTML = messageHTML;
     addMessageHoverEvents(messageElement);

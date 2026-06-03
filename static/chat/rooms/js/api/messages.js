@@ -1,4 +1,4 @@
-import { roomId, lastMessageId, updateLastMessageId, isSending, setSendingStatus } from '../core/config.js';
+import { roomId, lastMessageId, updateLastMessageId, isSending, setSendingStatus, currentUser } from '../core/config.js';
 import { getCookie } from '../core/constants.js';
 import { scrollToBottom, showSystemMessage } from '../core/utils.js';
 import { stopTyping } from './typing.js';
@@ -63,8 +63,8 @@ export async function sendMessage(message, replyTo = null) {
         const tempTimestamp = new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
         const messageData = {
             id: tempMessageId,
-            sender: window.currentUser,
-            sender_display: window.currentUser,
+            sender: currentUser || window.CURRENT_USER || 'غير معروف',
+            sender_display: currentUser || window.CURRENT_USER || 'غير معروف',
             message: messageText,
             timestamp: tempTimestamp,
             message_type: 'text'
@@ -116,6 +116,28 @@ export async function sendMessage(message, replyTo = null) {
         if (response.ok) {
             const data = await response.json();
             console.log('✅ تم إرسال الرسالة بنجاح:', data);
+
+            if (tempMessageId) {
+                const tempMsg = document.querySelector(`[data-message-id="${tempMessageId}"]`);
+                if (tempMsg) {
+                    const updatedMessageData = {
+                        id: data.message_id,
+                        sender: data.sender || currentUser || window.CURRENT_USER,
+                        sender_display: data.sender_display || data.sender || currentUser || window.CURRENT_USER,
+                        message: messageText,
+                        timestamp: data.timestamp,
+                        message_type: 'text',
+                        reply_to: data.reply_to || null,
+                    };
+
+                    tempMsg.dataset.messageId = data.message_id;
+                    tempMsg.dataset.sender = updatedMessageData.sender_display;
+                    const { updateExistingMessage } = await import('../ui/messages.js');
+                    updateExistingMessage(tempMsg, updatedMessageData);
+                    updateLastMessageId(data.message_id);
+                }
+            }
+
             return data;
         } else {
             let errorData;

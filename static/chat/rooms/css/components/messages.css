@@ -445,12 +445,12 @@
 }
 
 .header-btn {
-    background: none;
+    background: rebeccapurple;
     border: none;
     color: var(--white);
     font-size: 18px;
     cursor: pointer;
-    padding: 6px;
+    padding: 20px;
     transition: opacity 0.3s;
 }
 
