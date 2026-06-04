@@ -3,14 +3,14 @@
     <div class="input-container">
         <div class="input-actions">
             <input type="file" id="image-input" accept="image/*" style="display: none;">
-            <button class="action-btn image-btn" onclick="document.getElementById('image-input').click()" title="إرسال صورة">
+            <button type="button" class="action-btn image-btn" onclick="document.getElementById('image-input').click()" title="إرسال صورة" aria-label="إرسال صورة">
                 <span class="icon-text" aria-hidden="true">🖼️</span>
             </button>
             <input type="file" id="file-input" style="display: none;">
-            <button class="action-btn file-btn" onclick="document.getElementById('file-input').click()" title="إرسال ملف">
+            <button type="button" class="action-btn file-btn" onclick="document.getElementById('file-input').click()" title="إرسال ملف" aria-label="إرسال ملف">
                 <span class="icon-text" aria-hidden="true">📎</span>
             </button>
-            <button class="action-btn emoji-btn" title="إيموجي">
+            <button type="button" class="action-btn emoji-btn" title="إيموجي" aria-label="فتح منتقي الإيموجي">
                 <span class="icon-text" aria-hidden="true">😊</span>
             </button>
         </div>
@@ -25,7 +25,7 @@
             ></textarea>
         </div>
         
-        <button id="send-button" class="send-button" onclick="sendMessage()">
+        <button type="button" id="send-button" class="send-button" onclick="sendMessage()" title="إرسال رسالة" aria-label="إرسال رسالة">
             <span class="icon-text" aria-hidden="true">✈️</span>
         </button>
     </div>
