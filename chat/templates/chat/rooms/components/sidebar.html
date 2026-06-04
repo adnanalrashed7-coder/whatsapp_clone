@@ -2,8 +2,8 @@
 <div class="side-panel" id="side-panel">
     <div class="panel-header">
         <h3>أعضاء الغرفة</h3>
-        <button class="header-btn" onclick="toggleSidePanel()">
-            <i class="fas fa-times"></i>
+        <button class="header-btn" onclick="toggleSidePanel()" title="إغلاق اللوحة">
+            <span class="icon-text" aria-hidden="true">✖️</span>
         </button>
     </div>
     <div class="panel-content">
@@ -33,7 +33,7 @@
         </ul>
         {% else %}
         <div class="no-participants" style="text-align: center; padding: 20px; color: #888;">
-            <i class="fas fa-users" style="font-size: 48px; margin-bottom: 10px; opacity: 0.5;"></i>
+            <span class="icon-text" aria-hidden="true" style="font-size: 48px; margin-bottom: 10px; opacity: 0.5; display: inline-flex;">👥</span>
             <p>لا يوجد مشاركون في هذه الغرفة بعد</p>
         </div>
         {% endif %}
@@ -41,20 +41,20 @@
         <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
             {% if is_room_admin %}
             <a href="{% url 'chat:manage_room' room.id %}" class="manage-room-btn">
-                <i class="fas fa-cog"></i>
+                <span class="icon-text" aria-hidden="true">⚙️</span>
                 إدارة الغرفة
             </a>
             {% endif %}
             
             <a href="{% url 'chat:my_invitations' %}" class="settings-room-btn" style="background: #ffc107; color: #000;">
-                <i class="fas fa-envelope"></i>
+                <span class="icon-text" aria-hidden="true">✉️</span>
                 دعواتي
             </a>
             
             <form action="{% url 'accounts:logout' %}" method="post" style="display: block; margin-top: 10px;">
                 {% csrf_token %}
                 <button type="submit" class="settings-room-btn" onclick="return confirm('هل أنت متأكد من تسجيل الخروج؟')">
-                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="icon-text" aria-hidden="true">🚪</span>
                     تسجيل الخروج
                 </button>
             </form>

@@ -1,8 +1,8 @@
 <!-- الهيدر المحسن -->
 <div class="chat-header">
     <div class="header-left">
-        <button class="back-button" onclick="goBack()">
-            <i class="fas fa-arrow-right"></i>
+        <button class="back-button" onclick="goBack()" title="العودة">
+            <span class="icon-text" aria-hidden="true">↩️</span>
         </button>
         <div class="room-avatar">
             {{ room.name|first|upper }}
@@ -19,13 +19,13 @@
     
     <div class="header-actions">
         <button class="header-btn" onclick="searchInChat()" title="بحث">
-            <i class="fas fa-search"></i>
+            <span class="icon-text" aria-hidden="true">🔍</span>
         </button>
         <button class="header-btn" onclick="toggleSidePanel()" title="أعضاء الغرفة">
-            <i class="fas fa-users"></i>
+            <span class="icon-text" aria-hidden="true">👥</span>
         </button>
         <button class="header-btn" onclick="showRoomSettings()" title="الإعدادات">
-            <i class="fas fa-cog"></i>
+            <span class="icon-text" aria-hidden="true">⚙️</span>
         </button>
     </div>
 </div>

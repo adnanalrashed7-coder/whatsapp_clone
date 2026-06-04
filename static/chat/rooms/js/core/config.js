@@ -7,6 +7,8 @@ export let isPolling = true;
 export let isSending = false;
 export let replyingTo = null;
 export let isInitialized = false;
+export let offlineMode = false;
+export let messageCache = []; // in-memory cache (also persisted to localStorage)
 
 // متغيرات مؤشر الكتابة
 export let typingTimeout;
@@ -37,6 +39,63 @@ export function resetChatConfig() {
     clearInterval(typingCheckInterval);
     
     console.log('🔄 إعادة تعيين إعدادات الدردشة');
+}
+
+// ========== Offline / Cache Helpers ==========
+export function setOfflineMode(value) {
+    offlineMode = !!value;
+}
+
+export function getOfflineMode() {
+    return offlineMode;
+}
+
+export function loadCacheFromStorage() {
+    try {
+        const key = `chat_cache_room_${roomId}`;
+        const raw = localStorage.getItem(key);
+        if (raw) {
+            messageCache = JSON.parse(raw);
+        } else {
+            messageCache = [];
+        }
+    } catch (e) {
+        console.warn('خطأ في تحميل الكاش المحلي:', e);
+        messageCache = [];
+    }
+}
+
+export function saveCacheToStorage() {
+    try {
+        const key = `chat_cache_room_${roomId}`;
+        localStorage.setItem(key, JSON.stringify(messageCache || []));
+    } catch (e) {
+        console.warn('خطأ في حفظ الكاش المحلي:', e);
+    }
+}
+
+export function addMessagesToCache(newMessages) {
+    if (!Array.isArray(newMessages)) return;
+    // merge while avoiding duplicates by id
+    const existingIds = new Set((messageCache || []).map(m => m.id));
+    newMessages.forEach(m => {
+        if (!existingIds.has(m.id)) messageCache.push(m);
+    });
+    // keep cache size bounded
+    if (messageCache.length > 1000) {
+        messageCache = messageCache.slice(-1000);
+    }
+    saveCacheToStorage();
+}
+
+export function clearCacheStorage() {
+    try {
+        const key = `chat_cache_room_${roomId}`;
+        localStorage.removeItem(key);
+        messageCache = [];
+    } catch (e) {
+        console.warn('خطأ في مسح الكاش المحلي:', e);
+    }
 }
 
 export function updateLastMessageId(messageId) {

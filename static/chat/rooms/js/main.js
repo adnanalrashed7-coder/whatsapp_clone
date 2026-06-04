@@ -149,6 +149,11 @@ export function initEnhancedChat() {
     initInputEvents();
     initEmojiButton();
     initSidePanelEvents();
+
+    // إضافة زر مسح الكاش المحلي
+    import('./core/utils.js').then(({ createCacheClearButton }) => {
+        createCacheClearButton();
+    });
     
     // جعل الدوال متاحة globally
     makeFunctionsGlobal();

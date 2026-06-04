@@ -173,14 +173,113 @@ export function closeDeleteOptions() {
 export function showSystemMessage(message, type = 'info') {
     const chatMessages = document.getElementById('chat-messages');
     if (!chatMessages) return;
-    
+    // Avoid showing duplicate system messages with same key
+    const key = 'sys-' + encodeURIComponent(message);
+    if (chatMessages.querySelector(`.system-message[data-key="${key}"]`)) return;
+
     const systemMessage = document.createElement('div');
     systemMessage.className = 'system-message';
+    systemMessage.setAttribute('data-key', key);
     systemMessage.style.cssText = `
         background: ${type === 'error' ? '#f8d7da' : '#d4edda'};
         color: ${type === 'error' ? '#721c24' : '#155724'};
+        padding: 10px 12px;
+        border-radius: 8px;
+        margin: 8px 0;
     `;
     systemMessage.textContent = message;
     chatMessages.appendChild(systemMessage);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Only auto-scroll if the user is near the bottom
+    const isNearBottom = chatMessages.scrollHeight - chatMessages.clientHeight <= chatMessages.scrollTop + 100;
+    if (isNearBottom) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
+export function clearSystemMessages(keyContains = null) {
+    const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) return;
+    const systemMessages = Array.from(chatMessages.querySelectorAll('.system-message'));
+    systemMessages.forEach(el => {
+        if (!keyContains) {
+            el.remove();
+        } else {
+            const key = el.getAttribute('data-key') || '';
+            if (key.includes(encodeURIComponent(keyContains))) el.remove();
+        }
+    });
+}
+
+// Sticky banner shown at top of chat for persistent notices (e.g., offline)
+export function showStickyBanner(message, type = 'info') {
+    const container = document.getElementById('chat-container') || document.body;
+    let banner = document.getElementById('system-banner');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'system-banner';
+        banner.style.cssText = `
+            position: sticky;
+            top: 0;
+            z-index: 9999;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 8px 12px;
+            box-sizing: border-box;
+        `;
+        container.insertBefore(banner, container.firstChild);
+    }
+
+    banner.textContent = message;
+    if (type === 'error') {
+        banner.style.background = '#fdecea';
+        banner.style.color = '#721c24';
+        banner.style.borderBottom = '1px solid rgba(114,28,36,0.08)';
+    } else {
+        banner.style.background = '#e9f7ef';
+        banner.style.color = '#155724';
+        banner.style.borderBottom = '1px solid rgba(21,87,36,0.06)';
+    }
+}
+
+export function clearStickyBanner() {
+    const banner = document.getElementById('system-banner');
+    if (banner) banner.remove();
+}
+
+export function createCacheClearButton() {
+    const actions = document.querySelector('.header-actions');
+    const header = document.querySelector('.chat-header');
+    const container = actions || header || document.getElementById('chat-container') || document.body;
+    if (!container) return;
+
+    // Avoid duplicate button
+    if (document.getElementById('clear-cache-button')) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'clear-cache-button';
+    btn.className = 'header-btn cache-btn';
+    btn.textContent = 'مسح الكاش';
+    btn.title = 'مسح الرسائل المخزنة محلياً';
+    btn.addEventListener('click', async () => {
+        try {
+            const cfg = await import('../core/config.js');
+            cfg.clearCacheStorage();
+            clearStickyBanner();
+            showSystemMessage('تم مسح الكاش المحلي', 'info');
+            setTimeout(() => clearSystemMessages('تم مسح الكاش المحلي'), 3000);
+        } catch (e) {
+            console.error('خطأ في مسح الكاش:', e);
+            showSystemMessage('فشل في مسح الكاش', 'error');
+        }
+    });
+
+    if (actions) {
+        actions.appendChild(btn);
+    } else if (header) {
+        header.appendChild(btn);
+    } else {
+        container.appendChild(btn);
+    }
 }

@@ -1,6 +1,6 @@
-import { roomId, lastMessageId, updateLastMessageId, isSending, setSendingStatus, currentUser } from '../core/config.js';
+import { roomId, lastMessageId, updateLastMessageId, isSending, setSendingStatus, currentUser, setOfflineMode, loadCacheFromStorage, addMessagesToCache, messageCache } from '../core/config.js';
 import { getCookie } from '../core/constants.js';
-import { scrollToBottom, showSystemMessage } from '../core/utils.js';
+import { scrollToBottom, showSystemMessage, clearSystemMessages, showStickyBanner, clearStickyBanner } from '../core/utils.js';
 import { stopTyping } from './typing.js';
 
 // ========== دوال جلب الرسائل ==========
@@ -24,14 +24,34 @@ export async function fetchMessages() {
         if (messages.error) {
             throw new Error(messages.error);
         }
+
+        // On successful fetch, clear any previous system error messages and clear offline flag
+        clearSystemMessages('فشل في تحميل الرسائل');
+        clearStickyBanner();
+        setOfflineMode(false);
+
+        // add to local cache for offline viewing
+        try {
+            addMessagesToCache(messages);
+        } catch (e) {
+            console.warn('خطأ في تحديث الكاش المحلي:', e);
+        }
         
         console.log(`✅ تم جلب ${messages.length} رسالة`);
         return messages;
         
     } catch (error) {
         console.error('❌ خطأ في جلب الرسائل:', error);
-        showSystemMessage('فشل في تحميل الرسائل', 'error');
-        return [];
+        console.warn('التبديل إلى وضع عدم الاتصال، محاولة عرض الكاش المحلي');
+        setOfflineMode(true);
+        showStickyBanner('أنت حالياً غير متصل — سيتم عرض الرسائل المخزنة محلياً', 'error');
+        try {
+            loadCacheFromStorage();
+            return Array.isArray(messageCache) ? messageCache : [];
+        } catch (e) {
+            console.error('خطأ في جلب الكاش المحلي:', e);
+            return [];
+        }
     }
 }
 
@@ -85,7 +105,12 @@ export async function sendMessage(message, replyTo = null) {
         
         if (messageInput) {
             messageInput.value = '';
-            handleInputChange(messageInput);
+            try {
+                const { handleInputChange } = await import('../ui/input.js');
+                handleInputChange(messageInput);
+            } catch (e) {
+                console.warn('⚠️ فشل في تحديث حقل الإدخال بعد الإرسال:', e);
+            }
         }
         
         const requestData = { 
@@ -135,6 +160,19 @@ export async function sendMessage(message, replyTo = null) {
                     const { updateExistingMessage } = await import('../ui/messages.js');
                     updateExistingMessage(tempMsg, updatedMessageData);
                     updateLastMessageId(data.message_id);
+                    try {
+                        addMessagesToCache([{
+                            id: data.message_id,
+                            sender: data.sender || currentUser || window.CURRENT_USER,
+                            sender_display: data.sender_display || data.sender || currentUser || window.CURRENT_USER,
+                            message: messageText,
+                            timestamp: data.timestamp,
+                            message_type: 'text',
+                            reply_to: data.reply_to || null
+                        }]);
+                    } catch (e) {
+                        console.warn('خطأ في إضافة الرسالة للكاش:', e);
+                    }
                 }
             }
 

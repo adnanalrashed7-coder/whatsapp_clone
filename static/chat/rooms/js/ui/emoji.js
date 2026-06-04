@@ -47,15 +47,28 @@ export function switchEmojiCategory(category) {
     });
 }
 
+export function showEmojiPicker() {
+    const picker = document.getElementById('emoji-picker');
+    if (!picker) return;
+    if (picker.style.display !== 'block') {
+        picker.style.display = 'block';
+        initEmojiPicker();
+    }
+}
+
+export function hideEmojiPicker() {
+    const picker = document.getElementById('emoji-picker');
+    if (!picker) return;
+    picker.style.display = 'none';
+}
+
 export function toggleEmojiPicker() {
     const picker = document.getElementById('emoji-picker');
     if (!picker) return;
-    
     if (picker.style.display === 'none' || !picker.style.display) {
-        picker.style.display = 'block';
-        initEmojiPicker();
+        showEmojiPicker();
     } else {
-        picker.style.display = 'none';
+        hideEmojiPicker();
     }
 }
 
@@ -88,18 +101,34 @@ export function insertEmoji(emoji) {
     }
 }
 
+let emojiHideTimeout = null;
+
 function initEmojiPickerEvents() {
+    const emojiBtn = document.querySelector('.emoji-btn');
+    const picker = document.getElementById('emoji-picker');
+
     // إغلاق منتقي الإيموجي عند النقر خارجها
     document.addEventListener('click', function(event) {
-        const picker = document.getElementById('emoji-picker');
-        const emojiBtn = document.querySelector('.emoji-btn');
-        
-        if (picker && picker.style.display === 'block' && 
-            !picker.contains(event.target) && 
-            !emojiBtn.contains(event.target)) {
-            picker.style.display = 'none';
+        if (!picker || picker.style.display !== 'block') return;
+        if (!picker.contains(event.target) && !emojiBtn.contains(event.target)) {
+            hideEmojiPicker();
         }
     });
+
+    if (picker) {
+        picker.addEventListener('mouseenter', () => {
+            if (emojiHideTimeout) {
+                clearTimeout(emojiHideTimeout);
+                emojiHideTimeout = null;
+            }
+        });
+
+        picker.addEventListener('mouseleave', () => {
+            emojiHideTimeout = setTimeout(() => {
+                hideEmojiPicker();
+            }, 250);
+        });
+    }
 }
 
 export function initEmojiButton() {
@@ -108,6 +137,19 @@ export function initEmojiButton() {
         emojiButton.addEventListener('click', function(e) {
             e.stopPropagation();
             toggleEmojiPicker();
+        });
+
+        emojiButton.addEventListener('mouseenter', function() {
+            showEmojiPicker();
+        });
+
+        emojiButton.addEventListener('mouseleave', function() {
+            emojiHideTimeout = setTimeout(() => {
+                const picker = document.getElementById('emoji-picker');
+                if (picker && !picker.matches(':hover')) {
+                    hideEmojiPicker();
+                }
+            }, 250);
         });
     }
 }
