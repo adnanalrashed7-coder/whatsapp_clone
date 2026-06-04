@@ -62,10 +62,14 @@ def signup(request):
                 messages.success(request, 'تم إرسال بريد التفعيل إلى بريدك الإلكتروني.')
                 return redirect('accounts:account_activation_sent')
             except Exception as e:
-                # ❌ إزالة user.delete() - لا تحذف المستخدم عند فشل الإرسال
+                # حذف المستخدم إذا فشل إرسال بريد التفعيل حتى لا يبقى البريد محجوزاً
+                try:
+                    user.delete()
+                    print(f"ℹ️ User deleted after failed activation email: {user.email}")
+                except Exception as delete_error:
+                    print(f"⚠️ Failed to delete user after email send failure: {delete_error}")
                 print(f"❌ EMAIL SENDING FAILED: {str(e)}")
                 messages.error(request, f'حدث خطأ في إرسال بريد التفعيل: {str(e)}. يرجى المحاولة لاحقاً أو التواصل مع الدعم.')
-                # يمكنك اختيارياً إضافة إعادة إرسال البريد لاحقاً
                 return render(request, 'accounts/signup.html', {'form': form})
     else:
         form = SignUpForm()
