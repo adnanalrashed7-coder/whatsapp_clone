@@ -1,5 +1,5 @@
 from .base import *
-from .chat_rooms import ChatRoom, RoomInvitation
+from .chat_rooms import ChatRoom, RoomInvitation, FriendRequest, Friendship
 from .messages import Message, Reaction, MessageEditHistory
 from .users import UserProfile
 from .realtime import OnlineUser, TypingStatus
@@ -14,6 +14,8 @@ __all__ = [
     # Chat Rooms
     'ChatRoom',
     'RoomInvitation',
+    'FriendRequest',
+    'Friendship',
     
     # Messages
     'Message',

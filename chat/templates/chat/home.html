@@ -486,6 +486,12 @@
             {% endif %}
         </span>
     </a>
+
+    <!-- زر دليل المستخدمين للدردشة الخاصة -->
+    <a href="{% url 'chat:user_directory' %}" class="create-room-btn" style="background: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span>👤</span>
+        <span>دعوة دردشة خاصة</span>
+    </a>
             <!-- أقسام الغرف -->
             <div class="rooms-tabs">
                 <button class="tab-btn active" onclick="switchTab('all', event)">جميع الغرف</button>

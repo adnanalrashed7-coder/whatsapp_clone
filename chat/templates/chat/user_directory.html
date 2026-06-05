@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل المستخدمين - دردشة خاصة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f5f7;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .page-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .header-row h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .btn-back {
+            background: #25D366;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .user-card {
+            background: white;
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .user-card h3 {
+            margin: 0 0 12px;
+            font-size: 18px;
+        }
+        .user-info {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-action,
+        .btn-secondary {
+            border: none;
+            cursor: pointer;
+            padding: 10px 16px;
+            border-radius: 999px;
+            font-size: 14px;
+            text-decoration: none;
+            text-align: center;
+        }
+        .btn-action {
+            background: #25D366;
+            color: white;
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .status-label {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            background: #fff9db;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-waiting {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="header-row">
+            <div>
+                <h1>👥 دليل المستخدمين</h1>
+                <p style="margin: 6px 0 0; color:#666; font-size:14px;">إرسال طلبات صداقة وفتح دردشة خاصة للأصدقاء.</p>
+            </div>
+            <div>
+                <a href="{% url 'chat:home' %}" class="btn-secondary">← العودة إلى الغرف</a>
+                <a href="{% url 'chat:my_friend_requests' %}" class="btn-action">طلبات الصداقة</a>
+            </div>
+        </div>
+
+        {% if friends %}
+        <div style="margin-bottom: 24px;">
+            <h2 style="margin-bottom: 12px;">🟢 قائمة الأصدقاء</h2>
+            <div class="users-grid">
+                {% for entry in friend_entries %}
+                <div class="user-card">
+                    <div>
+                        <h3>{{ entry.user.email }}</h3>
+                        <div class="user-info">
+                            <p>الاسم: {{ entry.user.get_full_name|default:entry.user.email }}</p>
+                            <p>الحالة: صديق</p>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        {% if entry.private_room %}
+                        <a href="{% url 'chat:room_detail' entry.private_room.id %}" class="btn-action">فتح دردشة مع الصديق</a>
+                        {% else %}
+                        <span class="status-label status-success">صديق</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="users-grid">
+            {% for entry in users %}
+            <div class="user-card">
+                <div>
+                    <h3>{{ entry.user.email }}</h3>
+                    <div class="user-info">
+                        <p>الاسم: {{ entry.user.get_full_name|default:entry.user.email }}</p>
+                        <p>الحالة:
+                            {% if entry.is_friend %}
+                                صديق
+                            {% elif entry.outgoing_request %}
+                                طلب صداقة مرسل
+                            {% elif entry.incoming_request %}
+                                طلب صداقة وارِد
+                            {% else %}
+                                غير متصل
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="actions">
+                    {% if entry.is_friend and entry.private_room %}
+                        <a href="{% url 'chat:room_detail' entry.private_room.id %}" class="btn-secondary">فتح الدردشة الخاصة</a>
+                    {% elif entry.incoming_request %}
+                        <a href="{% url 'chat:accept_friend_request' entry.incoming_request.token %}" class="btn-action">قبول</a>
+                        <a href="{% url 'chat:decline_friend_request' entry.incoming_request.token %}" class="btn-secondary">رفض</a>
+                    {% elif entry.outgoing_request %}
+                        <span class="status-label status-waiting">في انتظار الرد</span>
+                    {% else %}
+                        <form method="post" action="{% url 'chat:send_friend_request' entry.user.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-action">إرسال طلب صداقة</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

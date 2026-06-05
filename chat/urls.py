@@ -30,6 +30,11 @@ urlpatterns = [
     path('invitations/decline/<str:token>/', views.decline_invitation, name='decline_invitation'),
     path('invitations/my/', views.my_invitations, name='my_invitations'),
     path('invitations/check/<str:token>/', views.check_invitation, name='check_invitation'),
+    path('users/', views.user_directory, name='user_directory'),
+    path('friends/requests/', views.my_friend_requests, name='my_friend_requests'),
+    path('friends/request/<int:user_id>/', views.send_friend_request, name='send_friend_request'),
+    path('friends/accept/<str:token>/', views.accept_friend_request, name='accept_friend_request'),
+    path('friends/decline/<str:token>/', views.decline_friend_request, name='decline_friend_request'),
     
     # الوقت الحقيقي
     path('online-status/<str:room_id>/', views.update_online_status, name='update_online_status'),

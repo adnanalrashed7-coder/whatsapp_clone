@@ -127,7 +127,40 @@ class ChatRoom(BaseModel):
             print(f"✅ تم إضافة المنشئ كمشرف في {self.name}")
         
         return True
-    
+
+    @classmethod
+    def get_private_chat_name(cls, user1, user2):
+        """إنشاء اسم ثابت للمحادثة الخاصة بين مستخدمين."""
+        sorted_ids = sorted([str(user1.id), str(user2.id)])
+        return f"dm_{sorted_ids[0]}_{sorted_ids[1]}"
+
+    @classmethod
+    def get_or_create_private_chat(cls, inviter, invited_user):
+        """إنشاء أو جلب غرفة دردشة خاصة لطلب دعوة بين مستخدمين."""
+        if inviter.id == invited_user.id:
+            raise ValueError('لا يمكن إرسال دعوة للدردشة الخاصة لنفس المستخدم')
+
+        room_name = cls.get_private_chat_name(inviter, invited_user)
+        description = f"دردشة خاصة بين {inviter.email} و {invited_user.email}"
+
+        room, created = cls.objects.get_or_create(
+            name=room_name,
+            room_type='private',
+            defaults={
+                'created_by': inviter,
+                'description': description,
+                'max_participants': 2
+            }
+        )
+
+        if created:
+            room.participants.add(inviter, invited_user)
+            room.admins.add(inviter)
+            room.save()
+            print(f"✅ تم إنشاء غرفة خاصة جديدة: {room.name}")
+
+        return room
+
     def is_user_online(self, user):
         """التحقق إذا كان المستخدم متصلاً بالغرفة"""
         try:
@@ -197,6 +230,96 @@ class RoomInvitation(BaseModel):
             self.save()
             return True
         return False
-    
-    
-        
+
+
+class Friendship(BaseModel):
+    """نموذج للصداقة الثنائية بين مستخدمين."""
+    user1 = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='friendships_initiated')
+    user2 = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='friendships_received')
+
+    class Meta:
+        unique_together = [('user1', 'user2')]
+        ordering = ['-created_at']
+        verbose_name = 'صداقة'
+        verbose_name_plural = 'الصّداقات'
+
+    def save(self, *args, **kwargs):
+        if self.user1.id > self.user2.id:
+            self.user1, self.user2 = self.user2, self.user1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def be_friends(cls, user_a, user_b):
+        if user_a.id == user_b.id:
+            return False
+        user1, user2 = (user_a, user_b) if user_a.id < user_b.id else (user_b, user_a)
+        return cls.objects.filter(user1=user1, user2=user2).exists()
+
+    @classmethod
+    def create_friendship(cls, user_a, user_b):
+        if user_a.id == user_b.id:
+            return None
+        user1, user2 = (user_a, user_b) if user_a.id < user_b.id else (user_b, user_a)
+        friendship, created = cls.objects.get_or_create(user1=user1, user2=user2)
+        return friendship
+
+    @classmethod
+    def get_friends(cls, user):
+        friendships = cls.objects.filter(models.Q(user1=user) | models.Q(user2=user))
+        friends = []
+        for friendship in friendships:
+            friends.append(friendship.user2 if friendship.user1 == user else friendship.user1)
+        return friends
+
+
+class FriendRequest(BaseModel):
+    """نموذج لطلبات الصداقة بين المستخدمين."""
+    STATUS_CHOICES = [
+        ('pending', 'قيد الانتظار'),
+        ('accepted', 'مقبول'),
+        ('declined', 'مرفوض')
+    ]
+
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='sent_friend_requests')
+    receiver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='received_friend_requests')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        unique_together = [('sender', 'receiver')]
+        ordering = ['-created_at']
+        verbose_name = 'طلب صداقة'
+        verbose_name_plural = 'طلبات الصداقة'
+
+    def __str__(self):
+        return f"طلب صداقة من {self.sender.email} إلى {self.receiver.email}"
+
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+    def is_active(self):
+        return self.status == 'pending' and not self.is_expired()
+
+    def accept(self):
+        if not self.is_active():
+            return False
+        self.status = 'accepted'
+        self.save()
+        Friendship.create_friendship(self.sender, self.receiver)
+        room = ChatRoom.get_or_create_private_chat(self.sender, self.receiver)
+        return room
+
+    def decline(self):
+        if not self.is_active():
+            return False
+        self.status = 'declined'
+        self.save()
+        return True
+
+    def get_status_display(self):
+        if self.status == 'accepted':
+            return 'مقبول'
+        elif self.status == 'declined':
+            return 'مرفوض'
+        return 'قيد الانتظار'
